@@ -25,7 +25,7 @@ export default function SearchBar() {
   const getDpimsData = async () => {
     setResults([]);
     setLoading(true);
-    const url = `http://localhost:6565/v1/getdpims?nama=${search}`;
+    const url = `https://multi.calypsocloud.one/v1/getdpims?nama=${search}`;
     const response = await fetch(url);
     const data = await response.json();
     return data;

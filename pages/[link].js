@@ -27,7 +27,7 @@ export default function Info() {
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(
-        `http://localhost:6565/v1/getdpimsinfo?dpims=${link}`
+        `https://multi.calypsocloud.one/v1/getdpimsinfo?dpims=${link}`
       );
       const data = await response.json();
       setData(data);
