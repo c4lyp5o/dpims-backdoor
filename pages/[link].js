@@ -32,7 +32,10 @@ export default function Info() {
       const data = await response.json();
       setData(data);
     };
-    fetchData();
+    fetchData().catch((err) => {
+      setData([]);
+      console.log(err);
+    });
   }, []);
 
   // if (error) return <div>failed to load</div>;

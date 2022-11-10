@@ -20,6 +20,7 @@ export default function SearchBar() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openError, setOpenError] = useState(false);
 
   const getDpimsData = async () => {
     setResults([]);
@@ -32,6 +33,22 @@ export default function SearchBar() {
 
   const handleClose = (event, reason) => {
     setOpen(false);
+    setOpenError(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    getDpimsData()
+      .then((data) => {
+        setResults(data.matches);
+        setLoading(false);
+        setOpen(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+        setOpenError(true);
+      });
   };
 
   const Alert = React.forwardRef(function Alert(props, ref) {
@@ -47,14 +64,7 @@ export default function SearchBar() {
         }}
         noValidate
         autoComplete='off'
-        onSubmit={(e) => {
-          e.preventDefault();
-          getDpimsData().then((data) => {
-            setResults(data.matches);
-            setLoading(false);
-            setOpen(true);
-          });
-        }}
+        onSubmit={handleSubmit}
       >
         <div>
           <TextField
@@ -72,13 +82,7 @@ export default function SearchBar() {
           <Button
             variant='contained'
             sx={{ mt: 3, ml: 1, width: '10%' }}
-            onClick={() => {
-              getDpimsData().then((data) => {
-                setResults(data.matches);
-                setLoading(false);
-                setOpen(true);
-              });
-            }}
+            onClick={handleSubmit}
           >
             Search
           </Button>
@@ -89,6 +93,19 @@ export default function SearchBar() {
               sx={{ width: '100%' }}
             >
               Found {results.length} entries!
+            </Alert>
+          </Snackbar>
+          <Snackbar
+            onClose={handleClose}
+            open={openError}
+            autoHideDuration={6000}
+          >
+            <Alert
+              onClose={handleClose}
+              severity='error'
+              sx={{ width: '100%' }}
+            >
+              No data could be found! Network error?
             </Alert>
           </Snackbar>
         </div>
