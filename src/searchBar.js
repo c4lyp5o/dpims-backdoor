@@ -29,9 +29,9 @@ export default function SearchBar() {
     let query;
     setResults([]);
     setLoading(true);
-    const url = `http://localhost:6565/v1/getdpims?nama=${search}`;
+    const url = `https://multi.calypsocloud.one/v1/getdpims?nama=${search}`;
     const page = (direction) =>
-      `http://localhost:6565/v1/getdpims?nama=${search}&pageNum=${direction}&pageSize=${pages[0].result}`;
+      `https://multi.calypsocloud.one/v1/getdpims?nama=${search}&pageNum=${direction}&pageSize=${pages[0].result}`;
     if (!way) {
       query = url;
     }
