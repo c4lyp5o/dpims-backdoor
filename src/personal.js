@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
-import Skeleton from '@mui/material/Skeleton';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 const fetcher = (url) => fetch(url).then((r) => r.json());
 
@@ -29,24 +29,26 @@ export default function Personal() {
     <>
       {data.exactInfo.map((item) => (
         <>
-          <Typography variant='body1' gutterBottom>
-            Nama: {item.nama}
-          </Typography>
-          <Typography variant='body1' gutterBottom>
-            MDC Number: {item.registrationNo}
-          </Typography>
-          <Typography variant='body1' gutterBottom>
-            Date of Registration: {item.dateOfRegistration}
-          </Typography>
-          <Typography variant='body1' gutterBottom>
-            Category: {item.category}
-          </Typography>
-          <Typography variant='body1' gutterBottom>
-            Qualification: {item.qualification}
-          </Typography>
-          <Typography variant='body1' gutterBottom>
-            Practising Address: {item.practisingAddress}
-          </Typography>
+          <Box sx={{ minWidth: 275 }}>
+            <Card variant='outlined'>
+              <CardContent>
+                <Typography variant='h5' component='div'>
+                  Name: {item.nama}
+                </Typography>
+                <Typography variant='body2'>
+                  MDC Number: {item.registrationNo}
+                  <br />
+                  Date of Registration: {item.dateOfRegistration}
+                  <br />
+                  Category: {item.category}
+                  <br />
+                  Qualification: {item.qualification}
+                  <br />
+                  Practising Address: {item.practisingAddress}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
         </>
       ))}
     </>

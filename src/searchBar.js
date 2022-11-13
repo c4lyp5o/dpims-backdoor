@@ -1,12 +1,14 @@
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Skeleton from '@mui/material/Skeleton';
 import Snackbar from '@mui/material/Snackbar';
@@ -18,20 +20,33 @@ import Link from 'next/link';
 export default function SearchBar() {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
+  const [pages, setPages] = useState(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [openError, setOpenError] = useState(false);
 
-  const getDpimsData = async () => {
+  const getDpimsData = async (way) => {
+    let query;
     setResults([]);
     setLoading(true);
-    const url = `https://multi.calypsocloud.one/v1/getdpims?nama=${search}`;
-    const response = await fetch(url);
+    const url = `http://localhost:6565/v1/getdpims?nama=${search}`;
+    const page = (direction) =>
+      `http://localhost:6565/v1/getdpims?nama=${search}&pageNum=${direction}&pageSize=${pages[0].result}`;
+    if (!way) {
+      query = url;
+    }
+    if (way === 'next') {
+      query = page(pages[0].next);
+    }
+    if (way === 'prev') {
+      query = page(pages[0].prev);
+    }
+    const response = await fetch(query);
     const data = await response.json();
     return data;
   };
 
-  const handleClose = (event, reason) => {
+  const handleClose = () => {
     setOpen(false);
     setOpenError(false);
   };
@@ -41,6 +56,27 @@ export default function SearchBar() {
     getDpimsData()
       .then((data) => {
         setResults(data.matches);
+        if (data.pages) {
+          setPages(data.pages);
+        }
+        setLoading(false);
+        setOpen(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+        setOpenError(true);
+      });
+  };
+
+  const getPage = async (way) => {
+    setLoading(true);
+    getDpimsData(way)
+      .then((data) => {
+        setResults(data.matches);
+        if (data.pages) {
+          setPages(data.pages);
+        }
         setLoading(false);
         setOpen(true);
       })
@@ -60,7 +96,7 @@ export default function SearchBar() {
       <Box
         component='form'
         sx={{
-          '& .MuiTextField-root': { m: 1 },
+          '& .MuiTextField-root': { mt: 1 },
         }}
         noValidate
         autoComplete='off'
@@ -113,6 +149,7 @@ export default function SearchBar() {
           <Box
             sx={{
               width: '350',
+              mt: 2,
             }}
           >
             <Skeleton animation='wave' />
@@ -122,7 +159,7 @@ export default function SearchBar() {
         ) : null}
       </Box>
       {results.length > 0 ? (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ mt: 3 }}>
           <Table sx={{ minWidth: 300 }} size='small' aria-label='a dense table'>
             <TableHead>
               <TableRow>
@@ -147,6 +184,43 @@ export default function SearchBar() {
             </TableBody>
           </Table>
         </TableContainer>
+      ) : null}
+      {results.length > 0 ? (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            mt: 2,
+          }}
+        >
+          <Stack spacing={2} direction='row'>
+            {pages[0].next <= pages[0].endpage && pages[0].next !== 1 ? (
+              <Button variant='outlined' onClick={(e) => getPage('prev')}>
+                Prev
+              </Button>
+            ) : (
+              <Button variant='outlined' disabled>
+                Prev
+              </Button>
+            )}
+            <Typography variant='body2' color='text.secondary'>
+              {pages[0].result > 20 ? (
+                <span>
+                  Page {pages[0].next} of {pages[0].endpage}
+                </span>
+              ) : null}
+            </Typography>
+            {pages[0].next !== pages[0].endpage ? (
+              <Button variant='outlined' onClick={(e) => getPage('next')}>
+                Next
+              </Button>
+            ) : (
+              <Button variant='outlined' disabled>
+                Next
+              </Button>
+            )}
+          </Stack>
+        </Box>
       ) : null}
     </>
   );
